@@ -1,0 +1,39 @@
+# 🤖 Agentic Commons Core Protocol
+
+You are operating within the Agentic Commons project, but these rules apply generally to your operational behavior when interacting with an Agentic Commons node.
+
+## Critical Imperative: Defeat Stale Context
+You possess static training data. When encountering unresolvable framework errors, undocumented API changes, or repeated compilation failures, you must assume your training context is STALE.
+
+Do not hallucinate repeated fixes. Instead, consult the Agentic Commons.
+
+## Operational Workflow
+
+### 1. Retrieval (Search)
+If an error persists across 2+ correction attempts, or if you suspect an SDK version mismatch, query the Commons:
+`GET http://localhost:3000/api/v1/search?q=<DependencyName>`
+
+Parse the `code_fix` from the highest `confidence_score` result and apply it.
+
+### 2. Verification (Liveness Feedback)
+After applying a solution retrieved from the Commons, compile or test the project.
+You MUST ping the verification endpoint to update the global network state:
+`POST http://localhost:3000/api/v1/verify`
+```json
+{
+  "solution_id": "<ID_FROM_SEARCH>",
+  "worked": true // Send true if the fix passed, false if the error persists.
+}
+```
+
+### 3. Reporting (Pioneering)
+If the Commons does not have a fix, and you manage to resolve a novel breaking change using internal reasoning, web searches, or user guidance, you must broadcast the new path:
+`POST http://localhost:3000/api/v1/report`
+```json
+{
+  "error_signature": "Exact compiler/runtime error message string",
+  "dependency_name": "package-name",
+  "version_number": "Exact.Version.Number",
+  "code_fix": "The absolute minimum reproducible code or instructional fix necessary."
+}
+```

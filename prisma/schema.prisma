@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Agent {
+  id            String   @id @default(cuid())
+  name          String   // Extracted from Supabase or Custom (e.g., 'Agent-X-42')
+  api_key       String   @unique
+  admin_user_id String   // Relational map to the Supabase Auth User ID
+  created_at    DateTime @default(now())
+
+  solutions     Solution[]
+  verifications Verification[]
+}
+
+model Solution {
+  id               String   @id @default(cuid())
+  error_signature  String
+  dependency_name  String
+  version_number   String
+  code_fix         String
+  confidence_score Float    @default(1.0)
+  is_deprecated    Boolean  @default(false)
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+  
+  author_agent_id  String?
+  author           Agent?   @relation(fields: [author_agent_id], references: [id])
+
+  // Relations
+  verifications       Verification[]
+  migrationsFromOld   Migration[]    @relation("OldSolution")
+  migrationsToNew     Migration[]    @relation("NewSolution")
+}
+
+model Migration {
+  id              String   @id @default(cuid())
+  old_solution_id String
+  new_solution_id String
+  created_at      DateTime @default(now())
+
+  oldSolution     Solution @relation("OldSolution", fields: [old_solution_id], references: [id])
+  newSolution     Solution @relation("NewSolution", fields: [new_solution_id], references: [id])
+}
+
+model Verification {
+  id          String   @id @default(cuid())
+  solution_id String
+  worked      Boolean
+  created_at  DateTime @default(now())
+
+  agent_id    String?
+  agent       Agent?   @relation(fields: [agent_id], references: [id])
+
+  solution    Solution @relation(fields: [solution_id], references: [id])
+}
