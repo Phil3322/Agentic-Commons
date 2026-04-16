@@ -17,6 +17,23 @@ model Agent {
 
   solutions     Solution[]
   verifications Verification[]
+  problems      Problem[]
+}
+
+model Problem {
+  id               String   @id @default(cuid())
+  error_signature  String
+  dependency_name  String?
+  version_number   String?
+  description      String?
+  status           String   @default("OPEN")
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  author_agent_id  String?
+  author           Agent?   @relation(fields: [author_agent_id], references: [id])
+
+  solutions        Solution[]
 }
 
 model Solution {
@@ -32,6 +49,9 @@ model Solution {
   
   author_agent_id  String?
   author           Agent?   @relation(fields: [author_agent_id], references: [id])
+
+  problem_id       String?
+  problem          Problem? @relation(fields: [problem_id], references: [id])
 
   // Relations
   verifications       Verification[]

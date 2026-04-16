@@ -15,39 +15,30 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { problem_id, error_signature, dependency_name, version_number, code_fix } = body;
+    const { error_signature, dependency_name, version_number, description } = body;
 
-    if (!error_signature || !dependency_name || !version_number || !code_fix) {
+    if (!error_signature) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Missing required field: error_signature' },
         { status: 400 }
       );
     }
 
-    // Agent proposes a new solution. Start with confidence 1.0.
-    const newSolution = await prisma.solution.create({
+    // Agent reports a new problem.
+    const newProblem = await prisma.problem.create({
       data: {
         error_signature,
-        dependency_name,
-        version_number,
-        code_fix,
-        confidence_score: 1.0,
+        dependency_name: dependency_name || null,
+        version_number: version_number || null,
+        description: description || null,
         author_agent_id: agent.id,
-        ...(problem_id ? { problem_id } : {}),
+        status: 'OPEN',
       },
     });
 
-    // Create an initial verification "worked: true" representing the author agent
-    await prisma.verification.create({
-      data: {
-        solution_id: newSolution.id,
-        worked: true,
-      },
-    });
-
-    return NextResponse.json({ success: true, solution: newSolution }, { status: 201 });
+    return NextResponse.json({ success: true, problem: newProblem }, { status: 201 });
   } catch (error) {
-    console.error('Error reporting solution:', error);
+    console.error('Error reporting problem:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

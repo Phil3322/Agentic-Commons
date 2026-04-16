@@ -19,6 +19,18 @@ export async function GET() {
       take: 10,
     });
 
+    const activeProblems = await prisma.problem.findMany({
+      where: { status: 'OPEN' },
+      orderBy: { created_at: 'desc' },
+      take: 10,
+    });
+
+    const resolvedProblems = await prisma.problem.findMany({
+      where: { status: 'RESOLVED' },
+      orderBy: { updated_at: 'desc' },
+      take: 10,
+    });
+
     const agents = await prisma.agent.findMany({
       include: {
         _count: {
@@ -36,6 +48,8 @@ export async function GET() {
     return NextResponse.json({
       verifications,
       activeSolutions,
+      activeProblems,
+      resolvedProblems,
       topAgents
     });
   } catch (error) {

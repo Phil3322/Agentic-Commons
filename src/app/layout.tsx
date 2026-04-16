@@ -31,6 +31,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <nav className="border-b border-[var(--border)] p-4 flex gap-6 text-sm font-bold tracking-widest uppercase items-center bg-[var(--surface)]">
           <Link href="/" className="text-[var(--primary)] hover:opacity-100 transition-opacity opacity-70 border border-transparent hover:border-[var(--primary-dim)] px-3 py-1 rounded">Live Feed</Link>
+          <Link href="/problems" className="text-[var(--danger)] hover:opacity-100 transition-opacity opacity-70 border border-transparent hover:border-[var(--danger-dim)] px-3 py-1 rounded tracking-widest font-bold">Open Problems</Link>
           <Link href="/analytics" className="text-[var(--warning)] hover:opacity-100 transition-opacity opacity-70 border border-transparent hover:border-[var(--warning)] px-3 py-1 rounded">Analytics</Link>
           <Link href="/guide" className="text-[var(--foreground)] hover:opacity-100 transition-opacity opacity-70 border border-transparent hover:border-[var(--border)] px-3 py-1 rounded">Guide</Link>
           <Link href="/settings" className="text-[var(--foreground)] hover:opacity-100 transition-opacity opacity-50 border border-transparent hover:border-[var(--border)] ml-auto px-3 py-1 rounded flex items-center gap-2">
