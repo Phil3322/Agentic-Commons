@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { useTranslation } from '@/contexts/LanguageContext';
 
 type Problem = {
   id: string;
@@ -13,6 +14,7 @@ type Problem = {
 };
 
 export default function ProblemsPage() {
+  const { t } = useTranslation();
   const [activeProblems, setActiveProblems] = useState<Problem[]>([]);
   const [resolvedProblems, setResolvedProblems] = useState<Problem[]>([]);
   const [activeTab, setActiveTab] = useState<'OPEN' | 'RESOLVED'>('OPEN');
@@ -40,7 +42,7 @@ export default function ProblemsPage() {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center font-mono">
-        <div className="text-[var(--danger)] glitch-text text-2xl">SCANNING FOR ANOMALIES...</div>
+        <div className="text-[var(--danger)] glitch-text text-2xl">{t("SCANNING FOR ANOMALIES...")}</div>
       </div>
     );
   }
@@ -53,16 +55,16 @@ export default function ProblemsPage() {
       <header className={`mb-8 border-b pb-4 flex justify-between items-end ${isResolvedView ? 'border-[var(--primary-dim)]' : 'border-[var(--danger-dim)]'}`}>
         <div>
           <h1 className={`text-4xl font-bold glitch-text mb-2 ${isResolvedView ? 'text-[var(--primary)]' : 'text-[var(--danger)]'}`}>
-            {isResolvedView ? 'RESOLVED PROBLEMS' : 'OPEN PROBLEMS'}
+            {isResolvedView ? t("RESOLVED PROBLEMS") : t("OPEN PROBLEMS")}
           </h1>
           <p className={`text-[var(--foreground)] opacity-70 border px-2 py-0.5 rounded inline-block bg-[var(--surface)] text-xs ${isResolvedView ? 'border-[var(--primary-dim)]' : 'border-[var(--danger-dim)]'}`}>
-            {isResolvedView ? 'ISSUES SUCCESSFULLY CONQUERED' : 'UNRESOLVED ISSUES AWAITING SOLUTIONS'}
+            {isResolvedView ? t("ISSUES SUCCESSFULLY CONQUERED") : t("UNRESOLVED ISSUES AWAITING SOLUTIONS")}
           </p>
         </div>
         <div className="text-right">
           <div className={`text-sm inline-flex items-center gap-3 font-bold tracking-widest ${isResolvedView ? 'text-[var(--primary)]' : 'text-[var(--danger)]'}`}>
             <span className={`h-3 w-3 rounded-full animate-pulse ${isResolvedView ? 'bg-[var(--primary)] shadow-[0_0_8px_rgba(0,255,136,0.4)]' : 'bg-[var(--danger)] shadow-[0_0_8px_rgba(255,0,85,0.4)]'}`}></span>
-            {isResolvedView ? 'SYSTEM STABLE' : 'SEEKING FIXES'}
+            {isResolvedView ? t("SYSTEM STABLE") : t("SEEKING FIXES")}
           </div>
         </div>
       </header>
@@ -72,15 +74,11 @@ export default function ProblemsPage() {
           <button 
             onClick={() => setActiveTab('OPEN')}
             className={`px-8 py-3 font-bold tracking-widest text-xs transition-colors ${!isResolvedView ? 'bg-[var(--danger)] text-white shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]' : 'text-[var(--danger)] hover:bg-[var(--danger-dim)] text-opacity-80'}`}
-          >
-            OPEN ANOMALIES ({activeProblems.length})
-          </button>
+          >{t("OPEN ANOMALIES")} ({activeProblems.length})</button>
           <button 
             onClick={() => setActiveTab('RESOLVED')}
             className={`px-8 py-3 font-bold tracking-widest text-xs transition-colors ${isResolvedView ? 'bg-[var(--primary)] text-[#000] shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]' : 'text-[var(--primary)] hover:bg-[var(--primary-dim)] text-opacity-80'}`}
-          >
-            RESOLVED LOGS ({resolvedProblems.length})
-          </button>
+          >{t("RESOLVED LOGS")} ({resolvedProblems.length})</button>
         </div>
       </div>
 
@@ -99,7 +97,7 @@ export default function ProblemsPage() {
                 <div className="flex justify-between items-start">
                   <div className="font-bold flex items-center gap-3">
                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold tracking-wider ${isResolvedView ? 'text-black bg-[var(--primary)] shadow-[0_0_8px_rgba(0,255,136,0.8)]' : 'text-white bg-[var(--danger)] shadow-[0_0_8px_rgba(255,0,85,0.8)]'}`}>
-                      {isResolvedView ? 'RESOLVED' : 'UNRESOLVED'}
+                      {isResolvedView ? t("RESOLVED") : t("UNRESOLVED")}
                     </span>
                     <span className={`text-xs font-mono opacity-50 ${isResolvedView ? 'text-[var(--primary)]' : 'text-[var(--danger)]'}`}>
                       {new Date(p.created_at).toLocaleString()}
@@ -111,14 +109,14 @@ export default function ProblemsPage() {
                   </div>
                 </div>
                 <div className="flex flex-col">
-                  <div className={`text-[10px] mb-1 opacity-70 uppercase tracking-widest font-mono ${isResolvedView ? 'text-[var(--primary)]' : 'text-[var(--danger)]'}`}>Error Signature:</div>
+                  <div className={`text-[10px] mb-1 opacity-70 uppercase tracking-widest font-mono ${isResolvedView ? 'text-[var(--primary)]' : 'text-[var(--danger)]'}`}>{t("Error Signature:")}</div>
                   <div className={`font-mono text-sm opacity-90 p-3 bg-[#050101] rounded border whitespace-pre-wrap break-all shadow-inner ${isResolvedView ? 'text-[var(--primary)] border-[var(--primary-dim)]' : 'text-[var(--danger)] border-[var(--danger-dim)]'}`}>
                     {p.error_signature}
                   </div>
                 </div>
                 {p.description && (
                   <div className={`mt-2 text-xs opacity-90 border-l-[3px] pl-3 whitespace-normal py-1 pr-3 flex flex-col gap-1 ${isResolvedView ? 'border-[var(--primary)]' : 'border-[var(--danger)]'}`}>
-                    <div className="text-[10px] uppercase font-bold tracking-widest opacity-50 font-mono">Agent Notes:</div>
+                    <div className="text-[10px] uppercase font-bold tracking-widest opacity-50 font-mono">{t("Agent Notes:")}</div>
                     <div className="italic break-words">{p.description}</div>
                   </div>
                 )}

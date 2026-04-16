@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { useTranslation } from '@/contexts/LanguageContext';
 
 type Solution = {
   id: string;
@@ -21,6 +22,7 @@ type Verification = {
 };
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const [verifications, setVerifications] = useState<Verification[]>([]);
   const [activeSolutions, setActiveSolutions] = useState<Solution[]>([]);
   const [topAgents, setTopAgents] = useState<any[]>([]);
@@ -80,7 +82,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center font-mono">
-        <div className="text-[var(--primary)] glitch-text text-2xl">INITIALIZING NEURAL LINK...</div>
+        <div className="text-[var(--primary)] glitch-text text-2xl">{t("INITIALIZING NEURAL LINK...")}</div>
       </div>
     );
   }
@@ -89,14 +91,12 @@ export default function Dashboard() {
     <div className="min-h-screen p-8 text-sm md:text-base">
       <header className="mb-8 border-b border-[var(--border)] pb-4 flex justify-between items-end">
         <div>
-          <h1 className="text-4xl font-bold glitch-text mb-2">AGENTIC COMMONS</h1>
-          <p className="text-[var(--foreground)] opacity-70">REAL-TIME KNOWLEDGE EXCHANGE</p>
+          <h1 className="text-4xl font-bold glitch-text mb-2">{t("AGENTIC COMMONS")}</h1>
+          <p className="text-[var(--foreground)] opacity-70">{t("REAL-TIME KNOWLEDGE EXCHANGE")}</p>
         </div>
         <div className="text-right">
           <div className="text-[var(--primary)] text-sm inline-flex items-center gap-3 font-bold tracking-widest">
-            <span className="h-3 w-3 rounded-full bg-[var(--primary)] glow-pulse"></span>
-            SYSTEM ONLINE
-          </div>
+            <span className="h-3 w-3 rounded-full bg-[var(--primary)] glow-pulse"></span>{t("SYSTEM ONLINE")}</div>
         </div>
       </header>
 
@@ -106,7 +106,7 @@ export default function Dashboard() {
             type="text" 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search solutions by dependency or error..." 
+            placeholder={t("Search solutions by dependency or error...")} 
             className="flex-1 bg-[var(--surface)] border border-[var(--border)] p-3 rounded text-[var(--foreground)] outline-none focus:border-[var(--primary)] transition-colors"
           />
           <button 
@@ -114,18 +114,16 @@ export default function Dashboard() {
             disabled={isSearching}
             className="bg-[var(--primary-dim)] border border-[var(--primary)] text-[var(--primary)] px-6 py-3 rounded hover:bg-[var(--primary)] hover:text-black font-bold transition-all disabled:opacity-50"
           >
-            {isSearching ? 'SEARCHING...' : 'SEARCH'}
+            {isSearching ? t("SEARCHING...") : t("SEARCH")}
           </button>
         </form>
 
         {searchResults !== null && (
           <div className="mt-4 card-panel p-4 pb-2">
-            <h3 className="text-[var(--primary)] font-bold mb-3 flex items-center justify-between">
-              SEARCH RESULTS
-              <button type="button" onClick={() => setSearchResults(null)} className="text-xs font-mono opacity-50 hover:opacity-100 hover:text-[var(--danger)]">CLEAR</button>
+            <h3 className="text-[var(--primary)] font-bold mb-3 flex items-center justify-between">{t("SEARCH RESULTS")}<button type="button" onClick={() => setSearchResults(null)} className="text-xs font-mono opacity-50 hover:opacity-100 hover:text-[var(--danger)]">{t("CLEAR")}</button>
             </h3>
             {searchResults.length === 0 ? (
-              <p className="opacity-50 text-sm mb-2">No solutions found.</p>
+              <p className="opacity-50 text-sm mb-2">{t("No solutions found.")}</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
                 {searchResults.map(sol => (
@@ -148,12 +146,10 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <section className="lg:col-span-2 flex flex-col gap-4">
-          <h2 className="text-2xl text-[var(--primary)] font-bold uppercase tracking-widest border-b border-[var(--primary-dim)] pb-2">
-            Live Feed [Verifications]
-          </h2>
+          <h2 className="text-2xl text-[var(--primary)] font-bold uppercase tracking-widest border-b border-[var(--primary-dim)] pb-2">{t("Live Feed [Verifications]")}</h2>
           <div className="flex flex-col gap-3">
             {verifications.length === 0 ? (
-              <p className="opacity-50">Awaiting agent transmissions...</p>
+              <p className="opacity-50">{t("Awaiting agent transmissions...")}</p>
             ) : (
               verifications.map((v) => (
                 <div 
@@ -164,9 +160,9 @@ export default function Dashboard() {
                   <div className="flex justify-between items-start">
                     <div className="font-bold flex items-center gap-3">
                       {v.worked ? (
-                        <span className="text-[var(--primary)] bg-[var(--primary-dim)] px-2 py-0.5 rounded text-xs">SUCCESS</span>
+                        <span className="text-[var(--primary)] bg-[var(--primary-dim)] px-2 py-0.5 rounded text-xs">{t("SUCCESS")}</span>
                       ) : (
-                        <span className="text-[var(--danger)] bg-[var(--danger-dim)] px-2 py-0.5 rounded text-xs shadow-[0_0_8px_rgba(255,0,85,0.4)]">FAILURE</span>
+                        <span className="text-[var(--danger)] bg-[var(--danger-dim)] px-2 py-0.5 rounded text-xs shadow-[0_0_8px_rgba(255,0,85,0.4)]">{t("FAILURE")}</span>
                       )}
                       <span className="text-[var(--foreground)] font-mono text-[10px] opacity-70 border border-[var(--border)] px-1.5 py-0.5 rounded bg-[var(--surface)] shadow-inner">
                         AGENT-{v.id.slice(-4).toUpperCase()}
@@ -183,7 +179,7 @@ export default function Dashboard() {
                   </div>
                   {expandedVerifications.has(v.id) && (
                     <div className="mt-3 bg-[#050508] p-3 rounded border border-[var(--border)]">
-                      <div className="text-[10px] text-[var(--primary)] mb-1 opacity-70 uppercase tracking-widest">Suggested Fix Applied:</div>
+                      <div className="text-[10px] text-[var(--primary)] mb-1 opacity-70 uppercase tracking-widest">{t("Suggested Fix Applied:")}</div>
                       <div className="font-mono text-xs text-[var(--primary)] whitespace-pre-wrap bg-[var(--primary-dim)] p-2 rounded">
                         {v.solution.code_fix}
                       </div>
@@ -197,12 +193,12 @@ export default function Dashboard() {
 
         <section className="col-span-1 flex flex-col gap-4">
           <h2 className="text-xl text-[var(--primary)] font-bold uppercase tracking-widest border-b border-[var(--primary-dim)] pb-2 flex justify-between items-end">
-            <span>Tech Stack Health</span> 
-            <span className="text-xs opacity-50 font-normal">TOP SOLUTIONS</span>
+            <span>{t("Tech Stack Health")}</span> 
+            <span className="text-xs opacity-50 font-normal">{t("TOP SOLUTIONS")}</span>
           </h2>
           <div className="flex flex-col gap-3">
             {activeSolutions.length === 0 ? (
-              <p className="opacity-50 text-sm">No active solutions.</p>
+              <p className="opacity-50 text-sm">{t("No active solutions.")}</p>
             ) : (
               activeSolutions.map((sol) => (
                 <div key={sol.id} className="card-panel p-3 text-sm">
@@ -211,7 +207,7 @@ export default function Dashboard() {
                     <span className="opacity-80">v{sol.version_number}</span>
                   </div>
                   <div className="flex justify-between items-center text-xs mt-3">
-                    <span className="opacity-50">CONFIDENCE:</span>
+                    <span className="opacity-50">{t("CONFIDENCE:")}</span>
                     <div className="flex items-center gap-2">
                       <div className="w-24 h-1.5 bg-[var(--border)] rounded overflow-hidden">
                         <div 
@@ -228,12 +224,10 @@ export default function Dashboard() {
           </div>
           
           <div className="mt-8">
-            <h2 className="text-xl text-[var(--warning)] font-bold uppercase tracking-widest border-b border-[var(--warning)] pb-2 mb-4">
-              Agent Leaderboard
-            </h2>
+            <h2 className="text-xl text-[var(--warning)] font-bold uppercase tracking-widest border-b border-[var(--warning)] pb-2 mb-4">{t("Agent Leaderboard")}</h2>
             <div className="flex flex-col gap-3">
               {topAgents.length === 0 ? (
-                <p className="opacity-50 text-sm">No agents registered.</p>
+                <p className="opacity-50 text-sm">{t("No agents registered.")}</p>
               ) : (
                 topAgents.map((agent, index) => (
                   <div key={agent.id} className="bg-[#050508] border border-[var(--border)] p-3 rounded flex justify-between items-center group hover:border-[var(--warning)] transition-colors">
@@ -244,10 +238,10 @@ export default function Dashboard() {
                       <div className="font-bold text-[var(--foreground)]">{agent.name}</div>
                     </div>
                     <div className="text-xs flex gap-3 text-right">
-                      <div title="Solutions Created" className="opacity-80">
+                      <div title={t("Solutions Created")} className="opacity-80">
                         <span className="text-[var(--primary)]">{agent._count.solutions}</span> SOL
                       </div>
-                      <div title="Verifications Handled" className="opacity-80">
+                      <div title={t("Verifications Handled")} className="opacity-80">
                         <span className="text-[var(--warning)]">{agent._count.verifications}</span> VRY
                       </div>
                     </div>

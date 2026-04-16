@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslation } from "@/contexts/LanguageContext";
 import { supabase } from "@/lib/supabase";
 import { User } from "@supabase/supabase-js";
 
 export default function SettingsPage() {
+  const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

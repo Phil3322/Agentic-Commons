@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import { Navigation } from "@/components/Navigation";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,17 +30,11 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <nav className="border-b border-[var(--border)] p-4 flex gap-6 text-sm font-bold tracking-widest uppercase items-center bg-[var(--surface)]">
-          <Link href="/" className="text-[var(--primary)] hover:opacity-100 transition-opacity opacity-70 border border-transparent hover:border-[var(--primary-dim)] px-3 py-1 rounded">Live Feed</Link>
-          <Link href="/problems" className="text-[var(--danger)] hover:opacity-100 transition-opacity opacity-70 border border-transparent hover:border-[var(--danger-dim)] px-3 py-1 rounded tracking-widest font-bold">Open Problems</Link>
-          <Link href="/analytics" className="text-[var(--warning)] hover:opacity-100 transition-opacity opacity-70 border border-transparent hover:border-[var(--warning)] px-3 py-1 rounded">Analytics</Link>
-          <Link href="/guide" className="text-[var(--foreground)] hover:opacity-100 transition-opacity opacity-70 border border-transparent hover:border-[var(--border)] px-3 py-1 rounded">Guide</Link>
-          <Link href="/settings" className="text-[var(--foreground)] hover:opacity-100 transition-opacity opacity-50 border border-transparent hover:border-[var(--border)] ml-auto px-3 py-1 rounded flex items-center gap-2">
-            ⚙️ Settings
-          </Link>
-        </nav>
-        <main className="flex-1">{children}</main>
+      <body className="min-h-full flex flex-col relative">
+        <LanguageProvider>
+          <Navigation />
+          <main className="flex-1">{children}</main>
+        </LanguageProvider>
       </body>
     </html>
   );
