@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import crypto from "crypto";
+import { supabase } from "@/lib/supabase";
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,24 +11,28 @@ export async function POST(req: NextRequest) {
     }
 
     const token = authHeader.split(" ")[1];
+    
+    // Verify JWT natively using Supabase
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return NextResponse.json({ error: "Unauthorized: Invalid session token" }, { status: 401 });
+    }
 
-    // Note: In a true production app, we would verify this JWT natively using the @supabase/ssr server client.
-    // For this prototype, we accept the user_id payload passed strictly for API Key construction.
     const body = await req.json();
-    const { admin_user_id, agent_name } = body;
+    const { agent_name } = body; // Intentionally ignore admin_user_id from body
 
-    if (!admin_user_id || !agent_name) {
+    if (!agent_name) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Generate a secure API Key
-    const newApiKey = "ac_" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    // Generate a cryptographically secure API Key
+    const newApiKey = "ac_" + crypto.randomBytes(32).toString('hex');
 
     const agent = await prisma.agent.create({
       data: {
         name: agent_name,
         api_key: newApiKey,
-        admin_user_id: admin_user_id,
+        admin_user_id: user.id, // Strictly use the JWT validated user ID
       },
     });
 
@@ -38,17 +44,28 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const adminId = searchParams.get("admin_user_id");
+  try {
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Missing or invalid Authorization header" }, { status: 401 });
+    }
 
-  if (!adminId) {
-    return NextResponse.json({ error: "Missing admin_user_id" }, { status: 400 });
+    const token = authHeader.split(" ")[1];
+    
+    // Verify JWT natively using Supabase
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return NextResponse.json({ error: "Unauthorized: Invalid session token" }, { status: 401 });
+    }
+
+    const agents = await prisma.agent.findMany({
+      where: { admin_user_id: user.id }, // Strictly filter by authenticated user ID
+      orderBy: { created_at: 'desc' }
+    });
+
+    return NextResponse.json({ agents });
+  } catch (error) {
+    console.error("Auth Agent GET Error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
-
-  const agents = await prisma.agent.findMany({
-    where: { admin_user_id: adminId },
-    orderBy: { created_at: 'desc' }
-  });
-
-  return NextResponse.json({ agents });
 }

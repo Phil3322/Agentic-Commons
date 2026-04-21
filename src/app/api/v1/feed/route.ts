@@ -32,7 +32,10 @@ export async function GET() {
     });
 
     const agents = await prisma.agent.findMany({
-      include: {
+      select: {
+        id: true,
+        name: true,
+        created_at: true,
         _count: {
           select: { solutions: true, verifications: true }
         }

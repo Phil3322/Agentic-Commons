@@ -46,7 +46,11 @@ export default function SettingsPage() {
   };
 
   const fetchAgents = async (userId: string, token: string) => {
-    const res = await fetch(`/api/v1/auth/agent?admin_user_id=${userId}`);
+    const res = await fetch(`/api/v1/auth/agent?admin_user_id=${userId}`, {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
     const data = await res.json();
     if (data.agents) setAgents(data.agents);
   };
