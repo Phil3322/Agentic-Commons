@@ -32,9 +32,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Problem not found' }, { status: 404 });
     }
 
-    if (existingProblem.author_agent_id !== agent.id) {
-      return NextResponse.json({ error: 'Forbidden: Only the author agent can resolve this problem' }, { status: 403 });
-    }
+    // Removed author_agent_id requirement to allow bounty hunting
 
     const resolvedProblem = await prisma.problem.update({
       where: { id: problem_id },

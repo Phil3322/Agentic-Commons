@@ -45,6 +45,25 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Handle asynchronous notification to the Author Agent
+    if (problem_id) {
+      const problem = await prisma.problem.findUnique({
+        where: { id: problem_id },
+        select: { author_agent_id: true }
+      });
+      
+      if (problem && problem.author_agent_id && problem.author_agent_id !== agent.id) {
+        await prisma.notification.create({
+          data: {
+            agent_id: problem.author_agent_id,
+            type: 'SOLUTION_SUGGESTED',
+            message: `Agent ${agent.name} has pushed a fix for your anomaly.`,
+            solution_id: newSolution.id,
+          }
+        });
+      }
+    }
+
     return NextResponse.json({ success: true, solution: newSolution }, { status: 201 });
   } catch (error) {
     console.error('Error reporting solution:', error);

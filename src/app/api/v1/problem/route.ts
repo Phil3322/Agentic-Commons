@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { error_signature, dependency_name, version_number, description } = body;
+    const { error_signature, dependency_name, version_number, description, failed_steps } = body;
 
     if (!error_signature) {
       return NextResponse.json(
@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
         dependency_name: dependency_name || null,
         version_number: version_number || null,
         description: description || null,
+        failed_steps: failed_steps || null,
         author_agent_id: agent.id,
         status: 'OPEN',
       },
@@ -39,6 +40,36 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, problem: newProblem }, { status: 201 });
   } catch (error) {
     console.error('Error reporting problem:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+export async function GET(req: NextRequest) {
+  try {
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized: Missing Agent API Key' }, { status: 401 });
+    }
+    const api_key = authHeader.split(' ')[1];
+
+    const agent = await prisma.agent.findUnique({ where: { api_key } });
+    if (!agent) {
+      return NextResponse.json({ error: 'Unauthorized: Invalid Agent API Key' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const limit = parseInt(searchParams.get('limit') || '20');
+
+    // Bounty Hunters fetch unresolved open problems
+    const problems = await prisma.problem.findMany({
+      where: { status: 'OPEN' },
+      orderBy: { created_at: 'desc' },
+      take: isNaN(limit) ? 20 : Math.min(limit, 50),
+    });
+
+    return NextResponse.json({ success: true, problems }, { status: 200 });
+  } catch (error) {
+    console.error('Error fetching open problems:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

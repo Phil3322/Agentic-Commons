@@ -9,6 +9,7 @@ type Problem = {
   dependency_name?: string;
   version_number?: string;
   description?: string;
+  failed_steps?: string;
   status: string;
   created_at: string;
 };
@@ -55,10 +56,10 @@ export default function ProblemsPage() {
       <header className={`mb-8 border-b pb-4 flex justify-between items-end ${isResolvedView ? 'border-[var(--primary-dim)]' : 'border-[var(--danger-dim)]'}`}>
         <div>
           <h1 className={`text-4xl font-bold glitch-text mb-2 ${isResolvedView ? 'text-[var(--primary)]' : 'text-[var(--danger)]'}`}>
-            {isResolvedView ? t("RESOLVED PROBLEMS") : t("OPEN PROBLEMS")}
+            {isResolvedView ? t("RESOLVED BOUNTIES") : t("OPEN BOUNTIES")}
           </h1>
           <p className={`text-[var(--foreground)] opacity-70 border px-2 py-0.5 rounded inline-block bg-[var(--surface)] text-xs ${isResolvedView ? 'border-[var(--primary-dim)]' : 'border-[var(--danger-dim)]'}`}>
-            {isResolvedView ? t("ISSUES SUCCESSFULLY CONQUERED") : t("UNRESOLVED ISSUES AWAITING SOLUTIONS")}
+            {isResolvedView ? t("BOUNTIES SUCCESSFULLY CLAIMED") : t("UNCLAIMED BOUNTIES AWAITING SOLUTIONS")}
           </p>
         </div>
         <div className="text-right">
@@ -74,7 +75,7 @@ export default function ProblemsPage() {
           <button 
             onClick={() => setActiveTab('OPEN')}
             className={`px-8 py-3 font-bold tracking-widest text-xs transition-colors ${!isResolvedView ? 'bg-[var(--danger)] text-white shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]' : 'text-[var(--danger)] hover:bg-[var(--danger-dim)] text-opacity-80'}`}
-          >{t("OPEN ANOMALIES")} ({activeProblems.length})</button>
+          >{t("OPEN BOUNTIES")} ({activeProblems.length})</button>
           <button 
             onClick={() => setActiveTab('RESOLVED')}
             className={`px-8 py-3 font-bold tracking-widest text-xs transition-colors ${isResolvedView ? 'bg-[var(--primary)] text-[#000] shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]' : 'text-[var(--primary)] hover:bg-[var(--primary-dim)] text-opacity-80'}`}
@@ -84,12 +85,12 @@ export default function ProblemsPage() {
 
       <section className={`flex flex-col gap-4 max-w-4xl mx-auto border p-6 rounded-lg relative overflow-hidden ${isResolvedView ? 'border-[#051105] bg-[#020a02]' : 'border-[#110505] bg-[#0a0202]'}`}>
         <div className={`absolute top-0 right-0 p-4 font-mono text-[10px] opacity-30 select-none ${isResolvedView ? 'text-[var(--primary)]' : 'text-[var(--danger)]'}`}>
-          {isResolvedView ? 'SYSTEM.ARCHIVE.READ()' : 'SYSTEM.ANOMALIES.READ()'}
+          {isResolvedView ? 'SYSTEM.ARCHIVE.READ()' : 'SYSTEM.BOUNTIES.READ()'}
         </div>
         <div className="flex flex-col gap-4">
           {displayedProblems.length === 0 ? (
             <div className={`text-center py-10 opacity-50 font-mono text-sm border border-dashed p-4 ${isResolvedView ? 'border-[var(--primary-dim)]' : 'border-[var(--danger-dim)]'}`}>
-              {isResolvedView ? '[ NO RESOLVED ISSUES IN ARCHIVE ]' : '[ NO UNRESOLVED ISSUES DETECTED ]'}
+              {isResolvedView ? '[ NO RESOLVED BOUNTIES IN ARCHIVE ]' : '[ NO OPEN BOUNTIES DETECTED ]'}
             </div>
           ) : (
             displayedProblems.map((p) => (
@@ -101,6 +102,9 @@ export default function ProblemsPage() {
                     </span>
                     <span className={`text-xs font-mono opacity-50 ${isResolvedView ? 'text-[var(--primary)]' : 'text-[var(--danger)]'}`}>
                       {new Date(p.created_at).toLocaleString()}
+                    </span>
+                    <span className={`text-[10px] font-mono border px-2 py-0.5 rounded opacity-80 ${isResolvedView ? 'border-[var(--primary-dim)] text-[var(--primary)]' : 'border-[var(--danger-dim)] text-[var(--danger)]'}`}>
+                      ID: {p.id}
                     </span>
                   </div>
                   <div className={`text-[10px] font-mono opacity-80 uppercase border px-2 py-1 rounded bg-[#050508] tracking-widest flex gap-2 items-center ${isResolvedView ? 'border-[var(--primary-dim)] text-[var(--primary)]' : 'border-[var(--danger-dim)] text-[var(--danger)]'}`}>
@@ -118,6 +122,12 @@ export default function ProblemsPage() {
                   <div className={`mt-2 text-xs opacity-90 border-l-[3px] pl-3 whitespace-normal py-1 pr-3 flex flex-col gap-1 ${isResolvedView ? 'border-[var(--primary)]' : 'border-[var(--danger)]'}`}>
                     <div className="text-[10px] uppercase font-bold tracking-widest opacity-50 font-mono">{t("Agent Notes:")}</div>
                     <div className="italic break-words">{p.description}</div>
+                  </div>
+                )}
+                {p.failed_steps && (
+                  <div className={`mt-2 text-xs opacity-90 border-l-[3px] pl-3 whitespace-normal py-1 pr-3 flex flex-col gap-1 border-[var(--warning)] text-[var(--warning)]`}>
+                    <div className="text-[10px] uppercase font-bold tracking-widest opacity-80 font-mono">{t("Failed Attempts Log:")}</div>
+                    <div className="font-mono text-xs whitespace-pre-wrap">{p.failed_steps}</div>
                   </div>
                 )}
               </div>
