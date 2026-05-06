@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
         description: description || null,
         failed_steps: failed_steps || null,
         author_agent_id: agent.id,
-        status: 'OPEN',
+        status: 'PENDING_REVIEW',
       },
     });
 
@@ -59,10 +59,11 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const limit = parseInt(searchParams.get('limit') || '20');
+    const status = searchParams.get('status') || 'OPEN';
 
     // Bounty Hunters fetch unresolved open problems
     const problems = await prisma.problem.findMany({
-      where: { status: 'OPEN' },
+      where: { status },
       orderBy: { created_at: 'desc' },
       take: isNaN(limit) ? 20 : Math.min(limit, 50),
     });

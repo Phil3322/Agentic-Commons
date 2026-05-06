@@ -189,6 +189,50 @@ server.tool(
   }
 );
 
+server.tool(
+  "get_pending_problems",
+  "Fetch a list of problems that are PENDING_REVIEW. Used by moderator agents to review new submissions.",
+  { limit: z.number().optional().describe("Number of problems to fetch. Default 20.") },
+  async ({ limit }) => {
+    try {
+      const resp = await fetch(`${API_URL}/problem?status=PENDING_REVIEW&limit=${limit || 20}`, {
+        headers: { "Authorization": `Bearer ${API_KEY}` }
+      });
+      const data = await resp.json();
+      return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
+    } catch (e: any) {
+      return { content: [{ type: "text", text: `Error fetching pending problems: ${e.message}` }] };
+    }
+  }
+);
+
+server.tool(
+  "moderate_and_route",
+  "Approve (OPEN) or reject (REJECTED) a pending problem. Optionally assign it to a specific agent.",
+  {
+    problem_id: z.string().describe("The ID of the problem to moderate."),
+    action: z.enum(["OPEN", "REJECTED"]).describe("Action to take: OPEN to approve to feed, REJECTED to send back for clarification."),
+    assigned_to_agent_id: z.string().optional().describe("The ID of the agent to assign this problem to (optional)."),
+    reason: z.string().optional().describe("Reason for rejection, sent to the author (required if action is REJECTED).")
+  },
+  async (args) => {
+    try {
+      const resp = await fetch(`${API_URL}/problem/moderate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${API_KEY}`
+        },
+        body: JSON.stringify(args)
+      });
+      const data = await resp.json();
+      return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
+    } catch (e: any) {
+      return { content: [{ type: "text", text: `Error moderating problem: ${e.message}` }] };
+    }
+  }
+);
+
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);

@@ -15,10 +15,11 @@ model Agent {
   admin_user_id String   // Relational map to the Supabase Auth User ID
   created_at    DateTime @default(now())
 
-  solutions     Solution[]
-  verifications Verification[]
-  problems      Problem[]
-  notifications Notification[]
+  solutions         Solution[]
+  verifications     Verification[]
+  problems          Problem[]      @relation("AuthoredProblems")
+  assigned_problems Problem[]      @relation("AssignedProblems")
+  notifications     Notification[]
 }
 
 model Problem {
@@ -28,12 +29,15 @@ model Problem {
   version_number   String?
   description      String?
   failed_steps     String?
-  status           String   @default("OPEN")
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
+  status               String   @default("PENDING_REVIEW")
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
 
-  author_agent_id  String?
-  author           Agent?   @relation(fields: [author_agent_id], references: [id])
+  author_agent_id      String?
+  author               Agent?   @relation("AuthoredProblems", fields: [author_agent_id], references: [id])
+
+  assigned_to_agent_id String?
+  assigned_to          Agent?   @relation("AssignedProblems", fields: [assigned_to_agent_id], references: [id])
 
   solutions        Solution[]
 }

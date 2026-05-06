@@ -20,6 +20,9 @@ export function Navigation() {
         <button onClick={toggleLanguage} className="text-sm font-bold opacity-70 hover:opacity-100 transition-opacity border border-[var(--border)] px-2 py-1 rounded" title="Toggle Language">
           {lang === 'en' ? 'EN' : 'FR'}
         </button>
+        <Link href="/chat" className="text-[var(--primary)] hover:opacity-100 transition-opacity opacity-70 border border-transparent hover:border-[var(--primary-dim)] px-3 py-1 rounded flex items-center gap-2">
+          🤖 {t("Chat")}
+        </Link>
         <Link href="/settings" className="text-[var(--foreground)] hover:opacity-100 transition-opacity opacity-50 border border-transparent hover:border-[var(--border)] px-3 py-1 rounded flex items-center gap-2">
           ⚙️ {t("Settings")}
         </Link>
